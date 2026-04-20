@@ -436,6 +436,11 @@
         if (!path) return render(viewList());
         if (path === 'favorites') return render(viewFavorites());
         if (path === 'recent') return render(viewRecent());
+        if (path === 'admin') return render(viewAdminList());
+        if (path === 'admin/new') return render(viewAdminForm(null));
+
+        const mEdit = path.match(/^admin\/edit\/(.+)$/);
+        if (mEdit) return render(viewAdminForm(mEdit[1]));
 
         const mCat = path.match(/^category\/(.+)$/);
         if (mCat) return render(viewCategory(mCat[1]));
@@ -538,6 +543,12 @@
                 </span>
                 ${recentCount > 0 ? `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700">${recentCount}</span>` : ''}
               </a>
+              <a href="#/admin" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm ${activeCategory === '__admin' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <span class="flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  管理(預覽)
+                </span>
+              </a>
             </div>
           </nav>
         </aside>
@@ -625,6 +636,283 @@
       const all = await dataStore.getAll();
       const positions = recentIds.map(id => all.find(p => p.id === id)).filter(Boolean);
       return listLayout('最近瀏覽', 'RECENTLY VIEWED', '__recent', positions, '還沒有瀏覽紀錄。');
+    }
+
+    // ===== 管理模式(Phase 2-3 樣板,不實際儲存) =====
+    function adminBannerHtml() {
+      return `
+        <div class="no-print bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800/60">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span><strong>預覽模式</strong> — 此為 Phase 2/3 介面樣板,儲存暫不會實際生效(尚未連接 Firebase)。</span>
+          </div>
+        </div>
+      `;
+    }
+
+    async function viewAdminList() {
+      const positions = await dataStore.getAll();
+      return `
+        ${headerHtml()}
+        ${adminBannerHtml()}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6">
+          ${sidebarHtml('__admin')}
+          <main class="flex-1 min-w-0">
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+              <div>
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">擺位管理</h1>
+                <p class="text-sm text-slate-500 mt-1">共 ${positions.length} 筆擺位</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="import-btn" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  匯入 JSON
+                </button>
+                <button id="export-btn" class="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  匯出 JSON
+                </button>
+                <a href="#/admin/new" class="px-3 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                  新增擺位
+                </a>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <table class="w-full text-sm">
+                <thead class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
+                  <tr>
+                    <th class="text-left px-4 py-3 font-medium">擺位</th>
+                    <th class="text-left px-4 py-3 font-medium hidden md:table-cell">分類</th>
+                    <th class="text-left px-4 py-3 font-medium hidden md:table-cell">狀態</th>
+                    <th class="text-left px-4 py-3 font-medium hidden lg:table-cell">更新日</th>
+                    <th class="text-right px-4 py-3 font-medium">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                  ${positions.map(p => {
+                    const cat = CATEGORIES.find(c => c.id === p.category);
+                    const thumb = (p.images && (p.images.xray_sample || p.images.positioning_photo)) || '';
+                    const isPending = p.notes && /範例|待補/.test(p.notes);
+                    return `
+                      <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40">
+                        <td class="px-4 py-3">
+                          <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded shrink-0 overflow-hidden ${thumb ? 'bg-black' : 'img-placeholder'}">
+                              ${thumb ? `<img src="${escapeHtml(thumb)}" alt="" class="w-full h-full object-contain">` : ''}
+                            </div>
+                            <div>
+                              <div class="font-medium text-slate-900 dark:text-white">${escapeHtml(p.name_zh)}</div>
+                              <div class="text-xs text-slate-500">${escapeHtml(p.body_part)} · ${escapeHtml(p.name_en)}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">${cat ? escapeHtml(cat.name_zh.replace('擺位','')) : ''}</td>
+                        <td class="px-4 py-3 hidden md:table-cell">
+                          ${isPending
+                            ? `<span class="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300">待補</span>`
+                            : `<span class="px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">已發布</span>`
+                          }
+                        </td>
+                        <td class="px-4 py-3 hidden lg:table-cell text-slate-500 text-xs">${escapeHtml(p.updated_at || '')}</td>
+                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                          <a href="#/position/${p.id}" class="px-2 py-1 text-slate-500 hover:text-brand-600 text-xs" title="查看">👁</a>
+                          <a href="#/admin/edit/${p.id}" class="px-2 py-1 text-slate-500 hover:text-brand-600 text-xs" title="編輯">✏️</a>
+                          <button class="admin-delete-btn px-2 py-1 text-slate-500 hover:text-red-600 text-xs" data-id="${p.id}" data-name="${escapeHtml(p.name_zh)}" title="刪除">🗑</button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </main>
+        </div>
+      `;
+    }
+
+    async function viewAdminForm(id) {
+      const isEdit = !!id;
+      const p = isEdit ? await dataStore.getById(id) : emptyPosition();
+      if (isEdit && !p) return `${headerHtml()}<div class="p-12 text-center text-slate-500">找不到擺位 ${escapeHtml(id)}</div>`;
+
+      return `
+        ${headerHtml()}
+        ${adminBannerHtml()}
+        <form id="admin-form" data-edit-id="${isEdit ? escapeHtml(id) : ''}" class="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+          <!-- 麵包屑 + 標題 -->
+          <div>
+            <a href="#/admin" class="text-xs text-slate-500 hover:text-brand-600">← 返回管理列表</a>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">${isEdit ? '編輯擺位' : '新增擺位'}</h1>
+          </div>
+
+          <!-- 基本資料 -->
+          ${formSectionHtml('基本資料', `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              ${textInput('name_zh', '中文名稱 *', p.name_zh, '例:頭顱前後位')}
+              ${textInput('name_en', '英文名稱 *', p.name_en, '例:Skull AP view')}
+              ${textInput('body_part', '部位大標 *', p.body_part, '例:SKULL')}
+              ${selectInput('category', '分類 *', p.category, CATEGORIES.map(c => ({value:c.id, label:c.name_zh})))}
+              ${textInput('id', '識別碼(自動)', p.id, '會自動以英文名生成', true)}
+              ${selectInput('status', '狀態', p.status || 'published', [
+                {value:'published', label:'發布'},
+                {value:'draft', label:'草稿(不顯示在前台)'}
+              ])}
+            </div>
+          `)}
+
+          <!-- 圖片上傳 -->
+          ${formSectionHtml('圖片', `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              ${imageInputHtml('positioning_photo', '擺位照', p.images?.positioning_photo)}
+              ${imageInputHtml('xray_sample', 'X 光示範片', p.images?.xray_sample)}
+            </div>
+            <p class="text-xs text-slate-400 mt-3">
+              💡 圖片上傳後會在 Phase 3 自動上傳到 Firebase Storage,目前為預覽。建議在上傳前移除個資(姓名、病歷號)。
+            </p>
+          `)}
+
+          <!-- 擺位姿勢 -->
+          ${formSectionHtml('Position of Patient(擺位/姿勢)', listInputHtml('position_of_patient', p.position_of_patient || []))}
+
+          <!-- SID + Central Ray -->
+          ${formSectionHtml('SID / Central Ray(距離/中心射線)', `
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+              ${textInput('sid_cm', 'SID (cm)', p.sid_cm || '', '例:100', false, 'number')}
+              <div class="sm:col-span-2">${textInput('central_ray', '中心射線位置', p.central_ray || '', '例:鼻根部(眉間)')}</div>
+            </div>
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">補充說明(每行一項)</label>
+            ${listInputHtml('central_ray_notes', p.central_ray_notes || [])}
+          `)}
+
+          <!-- 評片標準 -->
+          ${formSectionHtml('Evaluation Criteria(評片標準)', listInputHtml('evaluation_criteria', p.evaluation_criteria || []))}
+
+          <!-- Tips -->
+          ${formSectionHtml('Tips(提示,選填)', listInputHtml('tips', p.tips || []))}
+
+          <!-- Tags -->
+          ${formSectionHtml('Tags(標籤,逗號分隔)', `
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-slate-500 dark:text-slate-400">用於搜尋與篩選</span>
+              <button type="button" id="auto-tags-btn" class="text-xs text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1">
+                <span>🪄</span> 從部位/英文名自動產生
+              </button>
+            </div>
+            ${textInput('tags', '', (p.tags || []).join(', '), '例:頭部, 顱骨, AP, 前後位')}
+            <div id="auto-tags-preview" class="mt-2 flex flex-wrap gap-1.5 hidden"></div>
+          `)}
+
+          <!-- 備註 -->
+          ${formSectionHtml('備註(選填)', `
+            <textarea name="notes" rows="2" placeholder="任何備註..."
+                      class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">${escapeHtml(p.notes || '')}</textarea>
+          `)}
+
+          <!-- 底部操作列 -->
+          <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+            ${isEdit ? `<button type="button" id="form-delete-btn" data-id="${escapeHtml(id)}" class="px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-sm">刪除此筆</button>` : '<div></div>'}
+            <div class="flex items-center gap-2">
+              <a href="#/admin" class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm">取消</a>
+              <button type="button" id="form-preview-btn" class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm">預覽</button>
+              <button type="submit" class="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium">儲存</button>
+            </div>
+          </div>
+        </form>
+      `;
+    }
+
+    function emptyPosition() {
+      return {
+        id: '', category: 'head-neck', name_zh: '', name_en: '', body_part: '',
+        position_of_patient: [''], sid_cm: '', central_ray: '', central_ray_notes: [],
+        evaluation_criteria: [''], tips: [], tags: [],
+        images: { positioning_photo: '', xray_sample: '', extra: [] },
+        notes: '', status: 'published'
+      };
+    }
+
+    function formSectionHtml(title, body) {
+      return `
+        <section class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+          <h2 class="text-sm font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider mb-4">${escapeHtml(title)}</h2>
+          ${body}
+        </section>
+      `;
+    }
+
+    function textInput(name, label, value, placeholder, disabled = false, type = 'text') {
+      return `
+        <label class="block">
+          ${label ? `<span class="block text-xs text-slate-500 dark:text-slate-400 mb-1">${escapeHtml(label)}</span>` : ''}
+          <input type="${type}" name="${name}" value="${escapeHtml(value || '')}" placeholder="${escapeHtml(placeholder || '')}" ${disabled ? 'disabled' : ''}
+                 class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 ${disabled ? 'opacity-60 cursor-not-allowed' : ''}">
+        </label>
+      `;
+    }
+
+    function selectInput(name, label, value, options) {
+      return `
+        <label class="block">
+          <span class="block text-xs text-slate-500 dark:text-slate-400 mb-1">${escapeHtml(label)}</span>
+          <select name="${name}" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            ${options.map(o => `<option value="${escapeHtml(o.value)}" ${o.value === value ? 'selected' : ''}>${escapeHtml(o.label)}</option>`).join('')}
+          </select>
+        </label>
+      `;
+    }
+
+    function listInputHtml(name, items) {
+      const rows = (items.length ? items : ['']).map((v, i) => listRowHtml(name, v, i)).join('');
+      return `
+        <div class="list-input space-y-2" data-list-name="${name}">
+          ${rows}
+          <button type="button" class="list-add-btn flex items-center gap-1 text-sm text-brand-600 hover:text-brand-700 mt-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            新增一項
+          </button>
+        </div>
+      `;
+    }
+
+    function listRowHtml(name, value, idx) {
+      return `
+        <div class="list-row flex items-start gap-2">
+          <span class="text-xs text-slate-400 mt-2.5 w-6 text-right">${idx + 1}.</span>
+          <textarea name="${name}[]" rows="1" placeholder="輸入內容..."
+                    class="flex-1 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-y">${escapeHtml(value || '')}</textarea>
+          <button type="button" class="list-del-btn shrink-0 mt-1 w-8 h-8 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded" aria-label="刪除此項">
+            <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+          </button>
+        </div>
+      `;
+    }
+
+    function imageInputHtml(name, label, currentUrl) {
+      return `
+        <div class="image-input" data-name="${name}">
+          <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">${escapeHtml(label)}</div>
+          <label class="block cursor-pointer">
+            <div class="aspect-[4/3] rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-brand-500 dark:hover:border-brand-500 overflow-hidden bg-slate-50 dark:bg-slate-900 relative group">
+              <img class="img-preview w-full h-full object-contain ${currentUrl ? '' : 'hidden'}" src="${escapeHtml(currentUrl || '')}" alt="">
+              <div class="img-empty absolute inset-0 flex flex-col items-center justify-center text-slate-400 ${currentUrl ? 'hidden' : ''}">
+                <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span class="text-xs">點擊或拖檔上傳</span>
+              </div>
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-sm ${currentUrl ? '' : 'hidden'}">
+                更換圖片
+              </div>
+            </div>
+            <input type="file" accept="image/*" class="img-file-input hidden" data-name="${name}">
+          </label>
+          ${currentUrl ? `<button type="button" class="img-clear-btn text-xs text-red-500 hover:text-red-600 mt-1" data-name="${name}">移除圖片</button>` : ''}
+          <input type="hidden" name="${name}" value="${escapeHtml(currentUrl || '')}">
+        </div>
+      `;
     }
 
     function listLayout(titleZh, titleEn, activeCat, positions, emptyMsg) {
@@ -979,8 +1267,226 @@
         '<mark class="bg-amber-200 dark:bg-amber-500/40 text-inherit rounded px-0.5">$1</mark>');
     }
 
+    // ===== Tag 自動產生(對應 pipeline 的 make_tags 邏輯) =====
+    const BODY_PART_ZH = {
+      'SKULL': '頭顱', 'C-SPINE': '頸椎', 'T-SPINE': '胸椎', 'L-SPINE': '腰椎',
+      'CHEST': '胸部', 'SHOULDER': '肩關節', 'ABDOMEN': '腹部', 'PELVIS': '骨盆腔',
+      'HIP': '髖關節', 'KNEE': '膝關節', 'ANKLE': '踝關節', 'FOOT': '足部',
+      'ELBOW': '肘關節', 'WRIST': '腕關節', 'HAND': '手部', 'HUMERUS': '肱骨',
+      'FEMUR': '股骨', 'TIBIA': '脛骨', 'MANDIBLE': '下頷骨', 'TMJ': '顳顎關節',
+      'SINUS': '副鼻竇', 'FACIAL': '顏面骨', 'FACIAL BONE': '顏面骨', 'NASAL': '鼻骨'
+    };
+    const VIEW_ZH = [
+      ['AP', '前後位'], ['PA', '後前位'], ['LATERAL', '側位'],
+      ['OBLIQUE', '斜位'], ['FLEXION', '前屈位'], ['EXTENSION', '後伸位'],
+      ['OPEN MOUTH', '張口位'], ["WATER'S", "Water's"], ['TANGENTIAL', '切線位']
+    ];
+
+    function autoGenerateTags(bodyPart, nameEn, category) {
+      const set = new Set();
+      const bp = (bodyPart || '').toUpperCase().trim();
+      if (bp) {
+        set.add(bp);
+        if (BODY_PART_ZH[bp]) set.add(BODY_PART_ZH[bp]);
+      }
+      const en = (nameEn || '').toUpperCase();
+      VIEW_ZH.forEach(([k, z]) => {
+        if (en.includes(k)) { set.add(k); set.add(z); }
+      });
+      const cat = CATEGORIES.find(c => c.id === category);
+      if (cat) set.add(cat.name_zh.replace('擺位', ''));
+      return [...set];
+    }
+
+    // ===== 管理模式互動(預覽,不實際儲存) =====
+    function bindAdmin() {
+      // 列表頁:刪除按鈕
+      document.querySelectorAll('.admin-delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.dataset.name;
+          if (confirm(`確定要刪除「${name}」?\n\n(預覽模式,不會實際刪除)`)) {
+            toast(`已刪除「${name}」(預覽模式)`);
+          }
+        });
+      });
+
+      // 列表頁:匯入/匯出
+      const exportBtn = document.getElementById('export-btn');
+      if (exportBtn) exportBtn.addEventListener('click', async () => {
+        const all = await dataStore.getAll();
+        const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `positions-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast('已匯出 JSON');
+      });
+      const importBtn = document.getElementById('import-btn');
+      if (importBtn) importBtn.addEventListener('click', () => {
+        toast('Phase 3 將支援:選 JSON 檔合併進 Firestore');
+      });
+
+      // 表單頁
+      const form = document.getElementById('admin-form');
+      if (!form) return;
+
+      // 動態列表:新增列
+      form.querySelectorAll('.list-add-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const wrap = btn.closest('.list-input');
+          const name = wrap.dataset.listName;
+          const idx = wrap.querySelectorAll('.list-row').length;
+          btn.insertAdjacentHTML('beforebegin', listRowHtml(name, '', idx));
+          rebindListRow(wrap);
+        });
+      });
+      form.querySelectorAll('.list-input').forEach(rebindListRow);
+
+      // 圖片:選檔 → 預覽(以 dataURL,純展示)
+      form.querySelectorAll('.img-file-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const wrap = input.closest('.image-input');
+            const preview = wrap.querySelector('.img-preview');
+            const empty = wrap.querySelector('.img-empty');
+            const hidden = wrap.querySelector('input[type="hidden"]');
+            preview.src = reader.result;
+            preview.classList.remove('hidden');
+            empty.classList.add('hidden');
+            hidden.value = `(預覽:${file.name})`;
+          };
+          reader.readAsDataURL(file);
+          toast(`已選擇「${file.name}」(預覽模式,Phase 3 才會上傳 Firebase Storage)`);
+        });
+      });
+
+      // 圖片:移除
+      form.querySelectorAll('.img-clear-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const wrap = form.querySelector(`.image-input[data-name="${btn.dataset.name}"]`);
+          wrap.querySelector('.img-preview').classList.add('hidden');
+          wrap.querySelector('.img-empty').classList.remove('hidden');
+          wrap.querySelector('input[type="hidden"]').value = '';
+          btn.remove();
+        });
+      });
+
+      // 預覽
+      const previewBtn = document.getElementById('form-preview-btn');
+      if (previewBtn) previewBtn.addEventListener('click', () => {
+        toast('預覽功能:Phase 2 將開新視窗以詳情頁樣式呈現');
+      });
+
+      // 自動產生 tag
+      const autoTagBtn = document.getElementById('auto-tags-btn');
+      if (autoTagBtn) autoTagBtn.addEventListener('click', () => {
+        const bp = form.querySelector('[name="body_part"]').value;
+        const en = form.querySelector('[name="name_en"]').value;
+        const cat = form.querySelector('[name="category"]').value;
+        const generated = autoGenerateTags(bp, en, cat);
+        if (!generated.length) {
+          toast('請先填「部位大標」或「英文名稱」');
+          return;
+        }
+        const tagsInput = form.querySelector('[name="tags"]');
+        const existing = tagsInput.value.split(/[,，]\s*/).map(s => s.trim()).filter(Boolean);
+        // 合併:保留既有 + 新增不重複的
+        const merged = [...new Set([...existing, ...generated])];
+        tagsInput.value = merged.join(', ');
+
+        // 顯示這次新加的(預覽 chip)
+        const added = generated.filter(t => !existing.includes(t));
+        const preview = document.getElementById('auto-tags-preview');
+        preview.innerHTML = added.length
+          ? added.map(t => `<span class="px-2 py-0.5 rounded text-xs bg-brand-100 dark:bg-brand-700/40 text-brand-700 dark:text-brand-200">+ ${escapeHtml(t)}</span>`).join('')
+          : `<span class="text-xs text-slate-400">已存在,無新增</span>`;
+        preview.classList.remove('hidden');
+      });
+
+      // 刪除
+      const delBtn = document.getElementById('form-delete-btn');
+      if (delBtn) delBtn.addEventListener('click', () => {
+        const id = delBtn.dataset.id;
+        if (confirm(`確定要刪除這筆擺位?\n\n(預覽模式,不會實際刪除)`)) {
+          toast(`已刪除 ${id}(預覽模式)`);
+          router.go('/admin');
+        }
+      });
+
+      // 儲存
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = collectFormData(form);
+        const missing = [];
+        if (!data.name_zh) missing.push('中文名稱');
+        if (!data.name_en) missing.push('英文名稱');
+        if (!data.body_part) missing.push('部位大標');
+        if (missing.length) {
+          toast(`必填欄位未填:${missing.join('、')}`);
+          return;
+        }
+        console.log('[admin] 表單資料(預覽,未實際儲存):', data);
+        toast('已儲存(預覽模式)— 詳情已輸出到 console');
+      });
+    }
+
+    function rebindListRow(wrap) {
+      wrap.querySelectorAll('.list-del-btn').forEach(btn => {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', () => {
+          if (wrap.querySelectorAll('.list-row').length <= 1) {
+            // 最後一列只清空,不刪
+            btn.parentElement.querySelector('textarea').value = '';
+          } else {
+            btn.parentElement.remove();
+            // 重編號
+            wrap.querySelectorAll('.list-row').forEach((row, i) => {
+              row.querySelector('span').textContent = `${i + 1}.`;
+            });
+          }
+        });
+      });
+    }
+
+    function collectFormData(form) {
+      const fd = new FormData(form);
+      const obj = {};
+      const arrays = {};
+      for (const [k, v] of fd.entries()) {
+        if (k.endsWith('[]')) {
+          const key = k.slice(0, -2);
+          (arrays[key] = arrays[key] || []).push(v);
+        } else {
+          obj[k] = v;
+        }
+      }
+      // 陣列欄位:過濾空值
+      Object.entries(arrays).forEach(([k, arr]) => obj[k] = arr.filter(s => s.trim()));
+      // tags 由逗號切
+      if (typeof obj.tags === 'string') {
+        obj.tags = obj.tags.split(/[,，]\s*/).map(s => s.trim()).filter(Boolean);
+      }
+      // sid_cm 轉數字
+      if (obj.sid_cm) obj.sid_cm = Number(obj.sid_cm);
+      // 圖片
+      obj.images = {
+        positioning_photo: obj.positioning_photo || '',
+        xray_sample: obj.xray_sample || '',
+        extra: []
+      };
+      delete obj.positioning_photo;
+      delete obj.xray_sample;
+      return obj;
+    }
+
     function postRender() {
       bindSearch();
+      bindAdmin();
 
       // 深色模式
       const themeBtn = document.getElementById('theme-toggle');
