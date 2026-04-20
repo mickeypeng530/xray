@@ -32,6 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    html { font-size: 17px; }
     html, body { font-family: 'Noto Sans TC', system-ui, sans-serif; }
 
     /* 卡片淡入 */
@@ -101,19 +102,64 @@
   <script type="application/json" id="seed-data">
 [
   {
+    "id": "cspine-ap",
+    "category": "spine",
+    "name_zh": "頸椎前後位",
+    "name_en": "C-SPINE AP view",
+    "body_part": "C-SPINE",
+    "position_of_patient": [
+      "病人採直立的姿勢；並請病人將下巴抬高，與枕骨平行。",
+      "如果在擺位時發現病人有晃動之虞，記得請病人雙腳張開並停止呼吸。"
+    ],
+    "sid_cm": 100,
+    "central_ray": "C4 高度(約莫男性喉結高度)",
+    "central_ray_notes": [
+      "C4 高度向頭 15゜~ 20゜射入(如果下巴無法抬高時)"
+    ],
+    "evaluation_criteria": [
+      "影像範圍應包含 C3 至 T2。",
+      "下頷骨應與 C1 疊合並高於 C2。",
+      "椎間盤的空間應呈現打開的狀態。",
+      "雙側的下頷骨角與椎體應該呈現等距離。"
+    ],
+    "tips": [
+      "病人如果無法站立時，可以讓病人採坐姿方式；如果仍然不行，就只能以臥姿照相了。",
+      "若採臥姿照相時，要注意病人的肩膀不要聳高要盡量往下拉。"
+    ],
+    "images": {
+      "positioning_photo": "assets/images/cspine-ap_positioning.jpeg",
+      "xray_sample": "assets/images/cspine-ap_xray.jpeg",
+      "extra": [
+        "assets/images/cspine-ap_xray_annotated.jpeg"
+      ]
+    },
+    "tags": [
+      "頸椎",
+      "C-SPINE",
+      "AP",
+      "前後位"
+    ],
+    "indications": [],
+    "common_errors": [],
+    "notes": "",
+    "created_at": "2026-04-21",
+    "updated_at": "2026-04-21",
+    "status": "published"
+  },
+  {
     "id": "skull-ap",
     "category": "head-neck",
     "name_zh": "頭顱前後位",
-    "name_en": "Skull AP view",
+    "name_en": "SKULL AP view",
     "body_part": "SKULL",
     "position_of_patient": [
       "病人採直立或仰臥的姿勢。調整病人使頭部對準偵測器或檢查床的中心線。",
-      "調整病人頭部,使上眼眶-耳洞連線垂直偵測器或檢查床。如果是仰躺姿勢下巴無法壓低時,可以將後腦墊高。"
+      "調整病人頭部，使上眼眶-耳洞連線垂直偵測器或檢查床。如果是仰躺姿勢下巴無法壓低時，可以將後腦墊高。"
     ],
     "sid_cm": 100,
-    "central_ray": "鼻根部(眉間)",
+    "central_ray": "鼻根部 (眉間)",
     "central_ray_notes": [
-      "若判讀重點在整個顱骨時,射線向腳 15° 射入;或是請病人縮下巴,讓眼眶-耳洞連線可以垂直於偵測器。"
+      "若判讀重點在整個顱骨時，射線向腳 15°射入；或是請病人縮下巴，讓眼眶-耳洞連線可以垂直於偵測器。"
     ],
     "evaluation_criteria": [
       "雙側的眼眶外緣至頭顱邊緣的間距應該平均。",
@@ -121,13 +167,22 @@
       "額骨應該要能夠清晰可見。"
     ],
     "tips": [],
-    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
-    "tags": ["頭部", "顱骨", "AP", "前後位"],
+    "images": {
+      "positioning_photo": "assets/images/skull-ap_positioning.jpeg",
+      "xray_sample": "assets/images/skull-ap_xray.jpeg",
+      "extra": []
+    },
+    "tags": [
+      "頭顱",
+      "SKULL",
+      "AP",
+      "前後位"
+    ],
     "indications": [],
     "common_errors": [],
     "notes": "",
-    "created_at": "2026-04-20",
-    "updated_at": "2026-04-20",
+    "created_at": "2026-04-21",
+    "updated_at": "2026-04-21",
     "status": "published"
   },
   {
@@ -145,16 +200,25 @@
     "central_ray_notes": [],
     "evaluation_criteria": [
       "雙側岩部應完全重疊。",
-      "蝶鞍(sella turcica)應呈清晰側面像。"
+      "蝶鞍 (sella turcica) 應呈清晰側面像。"
     ],
     "tips": [],
-    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
-    "tags": ["頭部", "顱骨", "Lateral", "側位"],
+    "images": {
+      "positioning_photo": "",
+      "xray_sample": "",
+      "extra": []
+    },
+    "tags": [
+      "頭部",
+      "顱骨",
+      "Lateral",
+      "側位"
+    ],
     "indications": [],
     "common_errors": [],
-    "notes": "範例資料,待以實際 PDF 內容覆蓋。",
-    "created_at": "2026-04-20",
-    "updated_at": "2026-04-20",
+    "notes": "範例資料,待補完整內容。",
+    "created_at": "2026-04-21",
+    "updated_at": "2026-04-21",
     "status": "published"
   },
   {
@@ -175,47 +239,21 @@
       "上頷竇、眼眶、鼻骨應清楚呈現。"
     ],
     "tips": [],
-    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
-    "tags": ["顏面骨", "副鼻竇", "Water's"],
+    "images": {
+      "positioning_photo": "",
+      "xray_sample": "",
+      "extra": []
+    },
+    "tags": [
+      "顏面骨",
+      "副鼻竇",
+      "Water's"
+    ],
     "indications": [],
     "common_errors": [],
-    "notes": "範例資料,待以實際 PDF 內容覆蓋。",
-    "created_at": "2026-04-20",
-    "updated_at": "2026-04-20",
-    "status": "published"
-  },
-  {
-    "id": "cspine-ap",
-    "category": "spine",
-    "name_zh": "頸椎前後位",
-    "name_en": "C-spine AP view",
-    "body_part": "C-SPINE",
-    "position_of_patient": [
-      "病人採直立的姿勢;並請病人將下巴抬高,與枕骨平行。",
-      "如果在擺位時發現病人有晃動之虞,記得請病人雙腳張開並停止呼吸。"
-    ],
-    "sid_cm": 100,
-    "central_ray": "C4 高度(約莫男性喉結高度)",
-    "central_ray_notes": [
-      "若下巴無法抬高時,可從 C4 高度向頭 15°~20° 射入。"
-    ],
-    "evaluation_criteria": [
-      "影像範圍應包含 C3 至 T2。",
-      "下頷骨應與 C1 疊合並高於 C2。",
-      "椎間盤的空間應呈現打開的狀態。",
-      "雙側的下頷骨角與椎體應該呈現等距離。"
-    ],
-    "tips": [
-      "病人如果無法站立時,可以讓病人採坐姿方式;如果仍然不行,就只能以臥姿照相了。",
-      "若採臥姿照相時,要注意病人的肩膀不要聳高要盡量往下拉。"
-    ],
-    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
-    "tags": ["脊椎", "頸椎", "AP", "前後位"],
-    "indications": [],
-    "common_errors": [],
-    "notes": "",
-    "created_at": "2026-04-20",
-    "updated_at": "2026-04-20",
+    "notes": "範例資料,待補完整內容。",
+    "created_at": "2026-04-21",
+    "updated_at": "2026-04-21",
     "status": "published"
   },
   {
@@ -239,13 +277,22 @@
       "椎間盤空間清楚打開。"
     ],
     "tips": [],
-    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
-    "tags": ["脊椎", "頸椎", "Lateral", "側位"],
+    "images": {
+      "positioning_photo": "",
+      "xray_sample": "",
+      "extra": []
+    },
+    "tags": [
+      "脊椎",
+      "頸椎",
+      "Lateral",
+      "側位"
+    ],
     "indications": [],
     "common_errors": [],
-    "notes": "範例資料,待以實際 PDF 內容覆蓋。",
-    "created_at": "2026-04-20",
-    "updated_at": "2026-04-20",
+    "notes": "範例資料,待補完整內容。",
+    "created_at": "2026-04-21",
+    "updated_at": "2026-04-21",
     "status": "published"
   }
 ]
@@ -429,17 +476,22 @@
               </div>
             </a>
 
-            <div class="flex-1 relative">
+            <div class="flex-1 relative" id="search-wrap">
               <input type="search" id="search-input" value="${escapeHtml(searchValue)}"
                      placeholder="搜尋擺位名稱、部位、tag(中英文皆可)..."
+                     autocomplete="off" role="combobox" aria-autocomplete="list"
+                     aria-expanded="false" aria-controls="search-dropdown"
                      class="w-full pl-10 pr-10 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                      aria-label="搜尋">
-              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10 18a8 8 0 110-16 8 8 0 010 16z"/>
               </svg>
-              ${searchValue ? `<button id="search-clear" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" aria-label="清除搜尋">
+              <button id="search-clear" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 ${searchValue ? '' : 'hidden'}" aria-label="清除搜尋">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>` : ''}
+              </button>
+              <div id="search-dropdown" role="listbox" hidden
+                   class="absolute left-0 right-0 top-full mt-1 max-h-[70vh] overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl z-40">
+              </div>
             </div>
 
             <button id="theme-toggle" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300"
@@ -500,13 +552,17 @@
       const hasPhoto = p.images && p.images.positioning_photo;
       const thumb = hasXray || hasPhoto;
 
+      const isPending = p.notes && /範例|待補/.test(p.notes);
+
       return `
-        <a href="#/position/${p.id}" class="card-fade group block bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-500 transition">
+        <a href="#/position/${p.id}" class="card-fade group relative block bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-xl hover:border-brand-400 dark:hover:border-brand-500 hover:-translate-y-1 transition-all duration-200">
+          <span class="absolute top-0 left-4 right-4 h-0.5 bg-brand-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-full"></span>
           <div class="aspect-[4/5] relative overflow-hidden ${thumb ? 'bg-black' : 'img-placeholder'}">
             ${thumb
-              ? `<img src="${escapeHtml(hasXray || hasPhoto)}" alt="${escapeHtml(p.name_en)}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300">`
+              ? `<img src="${escapeHtml(hasXray || hasPhoto)}" alt="${escapeHtml(p.name_en)}" class="w-full h-full object-contain group-hover:scale-105 group-hover:opacity-75 transition duration-300">`
               : `<div class="absolute inset-0 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs">(圖片待補)</div>`
             }
+            ${isPending ? `<div class="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/70 dark:text-amber-200 ring-1 ring-amber-200 dark:ring-amber-800">待補</div>` : ''}
             <button class="fav-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/80 hover:scale-110 transition flex items-center justify-center"
                     data-id="${p.id}" aria-label="加入我的最愛" onclick="event.stopPropagation(); event.preventDefault();">
               <svg class="w-4 h-4 ${isFav ? 'text-amber-400' : 'text-slate-400'}" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -515,10 +571,10 @@
             </button>
           </div>
           <div class="p-3">
-            <div class="text-xs text-brand-600 dark:text-brand-400 font-medium">${escapeHtml(p.body_part)}</div>
-            <div class="mt-0.5 font-semibold text-slate-900 dark:text-white text-sm leading-tight">${escapeHtml(p.name_zh)}</div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(p.name_en)}</div>
-            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">${escapeHtml(catName)}</div>
+            <div class="text-xs text-brand-600 dark:text-brand-400 font-medium group-hover:text-brand-700 dark:group-hover:text-brand-300 transition">${escapeHtml(p.body_part)}</div>
+            <div class="mt-0.5 font-semibold text-slate-900 dark:text-white text-base leading-tight">${escapeHtml(p.name_zh)}</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(p.name_en)}</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">${escapeHtml(catName)}</div>
           </div>
         </a>
       `;
@@ -771,28 +827,160 @@
     }
 
     // ===== Post-render(綁定事件) =====
-    function postRender() {
-      // 搜尋
-      const searchInput = document.getElementById('search-input');
-      if (searchInput) {
-        searchInput.addEventListener('input', debounce(async (e) => {
-          const kw = e.target.value;
-          const results = await dataStore.search(kw);
-          const grid = document.getElementById('card-grid');
-          if (grid) {
-            grid.innerHTML = results.length
-              ? results.map(cardHtml).join('')
-              : emptyStateHtml('沒有符合搜尋條件的擺位。');
-          }
-        }, 120));
+    // ===== Typeahead 搜尋(下拉建議,任何頁可用) =====
+    let _searchActiveIdx = -1;
+    let _searchResults = [];
 
-        const clearBtn = document.getElementById('search-clear');
-        if (clearBtn) clearBtn.addEventListener('click', () => {
-          searchInput.value = '';
-          searchInput.dispatchEvent(new Event('input'));
-          searchInput.focus();
+    function bindSearch() {
+      const input = document.getElementById('search-input');
+      const dropdown = document.getElementById('search-dropdown');
+      const clearBtn = document.getElementById('search-clear');
+      const wrap = document.getElementById('search-wrap');
+      if (!input || !dropdown) return;
+
+      const updateDropdown = debounce(async () => {
+        const kw = input.value.trim();
+        clearBtn.classList.toggle('hidden', !kw);
+
+        // 列表頁:同時即時過濾下方卡片(若存在)
+        const grid = document.getElementById('card-grid');
+        if (grid) {
+          const all = await dataStore.search(kw);
+          grid.innerHTML = all.length
+            ? all.map(cardHtml).join('')
+            : emptyStateHtml('沒有符合搜尋條件的擺位。');
+        }
+
+        if (!kw) {
+          closeDropdown();
+          return;
+        }
+        _searchResults = (await dataStore.search(kw)).slice(0, 8);
+        _searchActiveIdx = _searchResults.length ? 0 : -1;
+        renderDropdown(kw);
+      }, 100);
+
+      function renderDropdown(kw) {
+        if (!_searchResults.length) {
+          dropdown.innerHTML = `<div class="px-4 py-3 text-sm text-slate-400">找不到符合「${escapeHtml(kw)}」的擺位</div>`;
+          openDropdown();
+          return;
+        }
+        dropdown.innerHTML = _searchResults.map((p, i) => {
+          const cat = CATEGORIES.find(c => c.id === p.category);
+          const catName = cat ? cat.name_zh.replace('擺位', '') : '';
+          const thumb = (p.images && (p.images.xray_sample || p.images.positioning_photo)) || '';
+          const active = i === _searchActiveIdx;
+          return `
+            <a href="#/position/${p.id}" data-idx="${i}"
+               class="search-item flex items-center gap-3 px-3 py-2 border-b border-slate-100 dark:border-slate-700/50 last:border-0
+                      ${active ? 'bg-brand-50 dark:bg-brand-700/30' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40'}">
+              <div class="w-10 h-10 rounded shrink-0 overflow-hidden ${thumb ? 'bg-black' : 'img-placeholder'}">
+                ${thumb ? `<img src="${escapeHtml(thumb)}" alt="" class="w-full h-full object-contain">` : ''}
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-xs font-medium text-brand-600 dark:text-brand-400">${escapeHtml(p.body_part)}</span>
+                  <span class="text-sm font-semibold text-slate-900 dark:text-white truncate">${highlight(p.name_zh, kw)}</span>
+                </div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 truncate">${highlight(p.name_en, kw)} · ${escapeHtml(catName)}</div>
+              </div>
+            </a>
+          `;
+        }).join('');
+        openDropdown();
+
+        // 滑鼠 hover 同步高亮
+        dropdown.querySelectorAll('.search-item').forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            _searchActiveIdx = parseInt(el.dataset.idx, 10);
+            updateActiveStyle();
+          });
         });
       }
+
+      function updateActiveStyle() {
+        dropdown.querySelectorAll('.search-item').forEach((el, i) => {
+          el.classList.toggle('bg-brand-50', i === _searchActiveIdx);
+          el.classList.toggle('dark:bg-brand-700/30', i === _searchActiveIdx);
+        });
+        const active = dropdown.querySelector(`.search-item[data-idx="${_searchActiveIdx}"]`);
+        if (active) active.scrollIntoView({ block: 'nearest' });
+      }
+
+      function openDropdown() {
+        dropdown.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+      }
+      function closeDropdown() {
+        dropdown.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+        _searchActiveIdx = -1;
+        _searchResults = [];
+      }
+
+      input.addEventListener('input', updateDropdown);
+      input.addEventListener('focus', () => {
+        if (input.value.trim()) updateDropdown();
+      });
+
+      // 鍵盤導航
+      input.addEventListener('keydown', (e) => {
+        if (dropdown.hidden || !_searchResults.length) {
+          if (e.key === 'Enter' && _searchResults.length === 0 && input.value.trim()) {
+            // 純 enter 時也跳結果(若有的話) — 此分支為 noop fallback
+          }
+          return;
+        }
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          _searchActiveIdx = (_searchActiveIdx + 1) % _searchResults.length;
+          updateActiveStyle();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          _searchActiveIdx = (_searchActiveIdx - 1 + _searchResults.length) % _searchResults.length;
+          updateActiveStyle();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const pick = _searchResults[_searchActiveIdx] || _searchResults[0];
+          if (pick) {
+            closeDropdown();
+            input.blur();
+            router.go(`/position/${pick.id}`);
+          }
+        } else if (e.key === 'Escape') {
+          closeDropdown();
+          input.blur();
+        }
+      });
+
+      // 點擊外面關閉
+      document.addEventListener('click', (e) => {
+        if (!wrap.contains(e.target)) closeDropdown();
+      });
+
+      // 清除按鈕
+      if (clearBtn) clearBtn.addEventListener('click', () => {
+        input.value = '';
+        clearBtn.classList.add('hidden');
+        closeDropdown();
+        // 同步重置卡片過濾
+        const grid = document.getElementById('card-grid');
+        if (grid) router.handle();
+        input.focus();
+      });
+    }
+
+    function highlight(text, kw) {
+      if (!kw) return escapeHtml(text);
+      const safe = escapeHtml(text);
+      const safeKw = escapeHtml(kw).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return safe.replace(new RegExp(`(${safeKw})`, 'gi'),
+        '<mark class="bg-amber-200 dark:bg-amber-500/40 text-inherit rounded px-0.5">$1</mark>');
+    }
+
+    function postRender() {
+      bindSearch();
 
       // 深色模式
       const themeBtn = document.getElementById('theme-toggle');
