@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="亞東紀念醫院影像醫學科 — 放射擺位參考">
+  <title>放射擺位 — 亞東醫院影像醫學科</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'system-ui', '-apple-system', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    html, body { font-family: 'Noto Sans TC', system-ui, sans-serif; }
+
+    /* 卡片淡入 */
+    .card-fade { animation: fadeIn .25s ease-out both; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 列印樣式:只印詳情區塊,隱藏導航 */
+    @media print {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .print-area { max-width: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+      .print-area img { max-width: 48% !important; page-break-inside: avoid; }
+      a { color: inherit !important; text-decoration: none !important; }
+    }
+
+    /* 空圖片佔位 */
+    .img-placeholder {
+      background: repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 8px, #cbd5e1 8px, #cbd5e1 16px);
+    }
+    .dark .img-placeholder {
+      background: repeating-linear-gradient(45deg, #334155, #334155 8px, #1e293b 8px, #1e293b 16px);
+    }
+
+    /* Lightbox */
+    #lightbox:not([hidden]) { display: flex; }
+
+    /* Toast 動畫 */
+    .toast { animation: slideUp .3s ease-out, fadeOut .3s ease-in 2.2s forwards; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; }
+    }
+
+    /* 頂部標題下的分隔裝飾線 */
+    .title-bar::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: #2563eb;
+      margin: 8px auto 0;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-full">
+
+  <div id="app" class="min-h-full"></div>
+
+  <!-- Lightbox(點圖放大) -->
+  <div id="lightbox" hidden
+       class="fixed inset-0 z-50 bg-black/80 items-center justify-center p-4 cursor-zoom-out"
+       role="dialog" aria-label="圖片放大檢視">
+    <img id="lightbox-img" class="max-w-full max-h-full object-contain" alt="">
+  </div>
+
+  <!-- Toast 容器 -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- 初始種子資料(Phase 2 匯入後改寫 localStorage) -->
+  <script type="application/json" id="seed-data">
+[
+  {
+    "id": "skull-ap",
+    "category": "head-neck",
+    "name_zh": "頭顱前後位",
+    "name_en": "Skull AP view",
+    "body_part": "SKULL",
+    "position_of_patient": [
+      "病人採直立或仰臥的姿勢。調整病人使頭部對準偵測器或檢查床的中心線。",
+      "調整病人頭部,使上眼眶-耳洞連線垂直偵測器或檢查床。如果是仰躺姿勢下巴無法壓低時,可以將後腦墊高。"
+    ],
+    "sid_cm": 100,
+    "central_ray": "鼻根部(眉間)",
+    "central_ray_notes": [
+      "若判讀重點在整個顱骨時,射線向腳 15° 射入;或是請病人縮下巴,讓眼眶-耳洞連線可以垂直於偵測器。"
+    ],
+    "evaluation_criteria": [
+      "雙側的眼眶外緣至頭顱邊緣的間距應該平均。",
+      "雙側岩部嵴應對稱並落於眼眶的下方 1/3 處。",
+      "額骨應該要能夠清晰可見。"
+    ],
+    "tips": [],
+    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
+    "tags": ["頭部", "顱骨", "AP", "前後位"],
+    "indications": [],
+    "common_errors": [],
+    "notes": "",
+    "created_at": "2026-04-20",
+    "updated_at": "2026-04-20",
+    "status": "published"
+  },
+  {
+    "id": "skull-lateral",
+    "category": "head-neck",
+    "name_zh": "頭顱側位",
+    "name_en": "Skull Lateral view",
+    "body_part": "SKULL",
+    "position_of_patient": [
+      "(範例資料)病人採直立或俯臥,頭部側貼偵測器,對側手握把手穩定姿勢。",
+      "調整眼眶-耳洞連線平行偵測器底緣,瞳孔連線垂直偵測器。"
+    ],
+    "sid_cm": 100,
+    "central_ray": "外耳道上方 5 公分",
+    "central_ray_notes": [],
+    "evaluation_criteria": [
+      "雙側岩部應完全重疊。",
+      "蝶鞍(sella turcica)應呈清晰側面像。"
+    ],
+    "tips": [],
+    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
+    "tags": ["頭部", "顱骨", "Lateral", "側位"],
+    "indications": [],
+    "common_errors": [],
+    "notes": "範例資料,待以實際 PDF 內容覆蓋。",
+    "created_at": "2026-04-20",
+    "updated_at": "2026-04-20",
+    "status": "published"
+  },
+  {
+    "id": "waters-view",
+    "category": "head-neck",
+    "name_zh": "顏面骨 Water's view",
+    "name_en": "Water's view",
+    "body_part": "FACIAL BONE",
+    "position_of_patient": [
+      "(範例資料)病人採直立或俯臥,下巴頂住偵測器,鼻尖離片約 1 公分。",
+      "調整頭部使 OML 與偵測器呈 37 度夾角(MML 垂直偵測器)。"
+    ],
+    "sid_cm": 100,
+    "central_ray": "通過上頷竇中心(鼻尖後方)",
+    "central_ray_notes": [],
+    "evaluation_criteria": [
+      "岩部應投影於上頷竇下方。",
+      "上頷竇、眼眶、鼻骨應清楚呈現。"
+    ],
+    "tips": [],
+    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
+    "tags": ["顏面骨", "副鼻竇", "Water's"],
+    "indications": [],
+    "common_errors": [],
+    "notes": "範例資料,待以實際 PDF 內容覆蓋。",
+    "created_at": "2026-04-20",
+    "updated_at": "2026-04-20",
+    "status": "published"
+  },
+  {
+    "id": "cspine-ap",
+    "category": "spine",
+    "name_zh": "頸椎前後位",
+    "name_en": "C-spine AP view",
+    "body_part": "C-SPINE",
+    "position_of_patient": [
+      "病人採直立的姿勢;並請病人將下巴抬高,與枕骨平行。",
+      "如果在擺位時發現病人有晃動之虞,記得請病人雙腳張開並停止呼吸。"
+    ],
+    "sid_cm": 100,
+    "central_ray": "C4 高度(約莫男性喉結高度)",
+    "central_ray_notes": [
+      "若下巴無法抬高時,可從 C4 高度向頭 15°~20° 射入。"
+    ],
+    "evaluation_criteria": [
+      "影像範圍應包含 C3 至 T2。",
+      "下頷骨應與 C1 疊合並高於 C2。",
+      "椎間盤的空間應呈現打開的狀態。",
+      "雙側的下頷骨角與椎體應該呈現等距離。"
+    ],
+    "tips": [
+      "病人如果無法站立時,可以讓病人採坐姿方式;如果仍然不行,就只能以臥姿照相了。",
+      "若採臥姿照相時,要注意病人的肩膀不要聳高要盡量往下拉。"
+    ],
+    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
+    "tags": ["脊椎", "頸椎", "AP", "前後位"],
+    "indications": [],
+    "common_errors": [],
+    "notes": "",
+    "created_at": "2026-04-20",
+    "updated_at": "2026-04-20",
+    "status": "published"
+  },
+  {
+    "id": "cspine-lateral",
+    "category": "spine",
+    "name_zh": "頸椎側位",
+    "name_en": "C-spine Lateral view",
+    "body_part": "C-SPINE",
+    "position_of_patient": [
+      "(範例資料)病人採側身站立,肩膀下壓,下巴微抬。",
+      "雙手下垂或握重物以拉低肩膀,讓 C7 可以顯影。"
+    ],
+    "sid_cm": 180,
+    "central_ray": "C4 高度",
+    "central_ray_notes": [
+      "SID 加長至 180 cm 以減少放大率。"
+    ],
+    "evaluation_criteria": [
+      "影像範圍應包含 C1 至 T1。",
+      "下頷角不應重疊於頸椎椎體。",
+      "椎間盤空間清楚打開。"
+    ],
+    "tips": [],
+    "images": { "positioning_photo": "", "xray_sample": "", "extra": [] },
+    "tags": ["脊椎", "頸椎", "Lateral", "側位"],
+    "indications": [],
+    "common_errors": [],
+    "notes": "範例資料,待以實際 PDF 內容覆蓋。",
+    "created_at": "2026-04-20",
+    "updated_at": "2026-04-20",
+    "status": "published"
+  }
+]
+  </script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ===== 分類定義 =====
+    const CATEGORIES = [
+      { id: 'head-neck',        name_zh: '頭、頸部擺位',    name_en: 'Head & Neck' },
+      { id: 'chest-shoulder',   name_zh: '胸部、肩部擺位',  name_en: 'Chest & Shoulder' },
+      { id: 'spine',            name_zh: '脊椎擺位',        name_en: 'Spine' },
+      { id: 'abdomen-pelvis',   name_zh: '腹部、骨盆腔擺位', name_en: 'Abdomen & Pelvis' },
+      { id: 'upper-extremity',  name_zh: '上肢擺位',        name_en: 'Upper Extremity' },
+      { id: 'lower-extremity',  name_zh: '下肢擺位',        name_en: 'Lower Extremity' }
+    ];
+
+    const LS_KEYS = {
+      FAVORITES: 'radpos.favorites',
+      RECENT: 'radpos.recent',
+      THEME: 'radpos.theme'
+    };
+
+    // ===== 資料層(Phase 1:只讀 seed;Phase 2 會加 localStorage 寫入)=====
+    const dataStore = {
+      _cache: null,
+
+      async init() {
+        const el = document.getElementById('seed-data');
+        try {
+          this._cache = JSON.parse(el.textContent);
+        } catch (e) {
+          console.error('seed-data 解析失敗', e);
+          this._cache = [];
+        }
+      },
+
+      async getAll() {
+        return (this._cache || []).filter(p => p.status !== 'draft');
+      },
+
+      async getById(id) {
+        return (this._cache || []).find(p => p.id === id) || null;
+      },
+
+      async getByCategory(categoryId) {
+        return (await this.getAll()).filter(p => p.category === categoryId);
+      },
+
+      async search(keyword) {
+        const k = keyword.trim().toLowerCase();
+        if (!k) return this.getAll();
+        const all = await this.getAll();
+        return all.filter(p => {
+          const hay = [
+            p.name_zh, p.name_en, p.body_part,
+            ...(p.tags || [])
+          ].join(' ').toLowerCase();
+          return hay.includes(k);
+        });
+      },
+
+      async getRelated(position) {
+        if (!position) return [];
+        const all = await this.getAll();
+        // 同 body_part 優先,其次同分類
+        const same = all.filter(p => p.id !== position.id && p.body_part === position.body_part);
+        if (same.length >= 3) return same.slice(0, 4);
+        const cat = all.filter(p => p.id !== position.id && p.category === position.category && p.body_part !== position.body_part);
+        return [...same, ...cat].slice(0, 4);
+      }
+    };
+
+    // ===== 偏好(我的最愛、最近瀏覽、深色模式)=====
+    const prefs = {
+      getFavorites() {
+        try { return JSON.parse(localStorage.getItem(LS_KEYS.FAVORITES) || '[]'); }
+        catch { return []; }
+      },
+      isFavorite(id) { return this.getFavorites().includes(id); },
+      toggleFavorite(id) {
+        const favs = this.getFavorites();
+        const i = favs.indexOf(id);
+        if (i >= 0) { favs.splice(i, 1); toast('已從我的最愛移除'); }
+        else { favs.push(id); toast('已加入我的最愛'); }
+        localStorage.setItem(LS_KEYS.FAVORITES, JSON.stringify(favs));
+      },
+
+      getRecent() {
+        try { return JSON.parse(localStorage.getItem(LS_KEYS.RECENT) || '[]'); }
+        catch { return []; }
+      },
+      pushRecent(id) {
+        const list = this.getRecent().filter(x => x !== id);
+        list.unshift(id);
+        localStorage.setItem(LS_KEYS.RECENT, JSON.stringify(list.slice(0, 10)));
+      },
+
+      getTheme() {
+        const saved = localStorage.getItem(LS_KEYS.THEME);
+        if (saved) return saved;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      },
+      setTheme(t) {
+        localStorage.setItem(LS_KEYS.THEME, t);
+        applyTheme(t);
+      },
+      toggleTheme() {
+        this.setTheme(this.getTheme() === 'dark' ? 'light' : 'dark');
+      }
+    };
+
+    function applyTheme(t) {
+      document.documentElement.classList.toggle('dark', t === 'dark');
+    }
+
+    // ===== Toast =====
+    function toast(msg) {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = 'toast bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm pointer-events-auto';
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 2800);
+    }
+
+    // ===== 路由(hash-based)=====
+    const router = {
+      init() {
+        window.addEventListener('hashchange', () => this.handle());
+        this.handle();
+      },
+      go(path) { location.hash = path; },
+      handle() {
+        const hash = location.hash || '#/';
+        const m = hash.match(/^#\/?(.*)$/);
+        const path = m ? m[1] : '';
+
+        if (!path) return render(viewList());
+        if (path === 'favorites') return render(viewFavorites());
+        if (path === 'recent') return render(viewRecent());
+
+        const mCat = path.match(/^category\/(.+)$/);
+        if (mCat) return render(viewCategory(mCat[1]));
+
+        const mPos = path.match(/^position\/(.+)$/);
+        if (mPos) return render(viewDetail(mPos[1]));
+
+        render(viewList());
+      }
+    };
+
+    async function render(promise) {
+      const app = document.getElementById('app');
+      app.innerHTML = `<div class="flex items-center justify-center h-96 text-slate-400">載入中...</div>`;
+      try {
+        const html = await promise;
+        app.innerHTML = html;
+        window.scrollTo(0, 0);
+        // 呼叫該 view 的 post-render hook
+        if (typeof postRender === 'function') postRender();
+      } catch (e) {
+        console.error(e);
+        app.innerHTML = `<div class="flex items-center justify-center h-96 text-red-500">載入失敗:${e.message}</div>`;
+      }
+    }
+
+    // ===== 共用元件 =====
+    function headerHtml(searchValue = '') {
+      const isDark = document.documentElement.classList.contains('dark');
+      return `
+        <header class="no-print bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+            <a href="#/" class="flex items-center gap-2 shrink-0" aria-label="回首頁">
+              <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold">放</div>
+              <div class="hidden sm:block">
+                <div class="text-sm font-bold text-slate-900 dark:text-white leading-tight">放射擺位</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 leading-tight">亞東影像醫學科</div>
+              </div>
+            </a>
+
+            <div class="flex-1 relative">
+              <input type="search" id="search-input" value="${escapeHtml(searchValue)}"
+                     placeholder="搜尋擺位名稱、部位、tag(中英文皆可)..."
+                     class="w-full pl-10 pr-10 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                     aria-label="搜尋">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10 18a8 8 0 110-16 8 8 0 010 16z"/>
+              </svg>
+              ${searchValue ? `<button id="search-clear" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" aria-label="清除搜尋">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>` : ''}
+            </div>
+
+            <button id="theme-toggle" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300"
+                    aria-label="切換深色模式">
+              ${isDark
+                ? `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`
+                : `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>`
+              }
+            </button>
+          </div>
+        </header>
+      `;
+    }
+
+    function sidebarHtml(activeCategory = '') {
+      const favCount = prefs.getFavorites().length;
+      const recentCount = prefs.getRecent().length;
+      return `
+        <aside class="no-print lg:w-60 lg:shrink-0">
+          <nav class="lg:sticky lg:top-20 space-y-1">
+            <a href="#/" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${!activeCategory ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              全部擺位
+            </a>
+            ${CATEGORIES.map(c => `
+              <a href="#/category/${c.id}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${activeCategory === c.id ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                ${c.name_zh}
+              </a>
+            `).join('')}
+
+            <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700 space-y-1">
+              <a href="#/favorites" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm ${activeCategory === '__favorites' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <span class="flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                  我的最愛
+                </span>
+                ${favCount > 0 ? `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700">${favCount}</span>` : ''}
+              </a>
+              <a href="#/recent" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm ${activeCategory === '__recent' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <span class="flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  最近瀏覽
+                </span>
+                ${recentCount > 0 ? `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700">${recentCount}</span>` : ''}
+              </a>
+            </div>
+          </nav>
+        </aside>
+      `;
+    }
+
+    function cardHtml(p) {
+      const cat = CATEGORIES.find(c => c.id === p.category);
+      const catName = cat ? cat.name_zh.replace('擺位', '') : p.category;
+      const isFav = prefs.isFavorite(p.id);
+      const hasXray = p.images && p.images.xray_sample;
+      const hasPhoto = p.images && p.images.positioning_photo;
+      const thumb = hasXray || hasPhoto;
+
+      return `
+        <a href="#/position/${p.id}" class="card-fade group block bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-500 transition">
+          <div class="aspect-[4/5] relative overflow-hidden ${thumb ? 'bg-black' : 'img-placeholder'}">
+            ${thumb
+              ? `<img src="${escapeHtml(hasXray || hasPhoto)}" alt="${escapeHtml(p.name_en)}" class="w-full h-full object-contain group-hover:scale-105 transition duration-300">`
+              : `<div class="absolute inset-0 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs">(圖片待補)</div>`
+            }
+            <button class="fav-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/80 hover:scale-110 transition flex items-center justify-center"
+                    data-id="${p.id}" aria-label="加入我的最愛" onclick="event.stopPropagation(); event.preventDefault();">
+              <svg class="w-4 h-4 ${isFav ? 'text-amber-400' : 'text-slate-400'}" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="p-3">
+            <div class="text-xs text-brand-600 dark:text-brand-400 font-medium">${escapeHtml(p.body_part)}</div>
+            <div class="mt-0.5 font-semibold text-slate-900 dark:text-white text-sm leading-tight">${escapeHtml(p.name_zh)}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${escapeHtml(p.name_en)}</div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">${escapeHtml(catName)}</div>
+          </div>
+        </a>
+      `;
+    }
+
+    function titleBarHtml(zh, en) {
+      return `
+        <div class="no-print text-center py-8 title-bar">
+          <div class="text-xs tracking-[0.3em] text-slate-400 uppercase">${escapeHtml(en || '')}</div>
+          <h1 class="mt-2 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">${escapeHtml(zh)}</h1>
+        </div>
+      `;
+    }
+
+    function emptyStateHtml(msg) {
+      return `
+        <div class="col-span-full flex flex-col items-center justify-center py-24 text-slate-400 dark:text-slate-500">
+          <svg class="w-16 h-16 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div class="text-sm">${escapeHtml(msg)}</div>
+        </div>
+      `;
+    }
+
+    // ===== Views =====
+    async function viewList() {
+      const positions = await dataStore.getAll();
+      return listLayout('放射擺位', 'RADIOGRAPHIC POSITIONING', '', positions);
+    }
+
+    async function viewCategory(catId) {
+      const cat = CATEGORIES.find(c => c.id === catId);
+      if (!cat) return viewList();
+      const positions = await dataStore.getByCategory(catId);
+      return listLayout(cat.name_zh, cat.name_en, catId, positions);
+    }
+
+    async function viewFavorites() {
+      const favIds = prefs.getFavorites();
+      const all = await dataStore.getAll();
+      const positions = favIds.map(id => all.find(p => p.id === id)).filter(Boolean);
+      return listLayout('我的最愛', 'MY FAVORITES', '__favorites', positions, '還沒有收藏任何擺位。點進詳情頁,按右上角星號即可收藏。');
+    }
+
+    async function viewRecent() {
+      const recentIds = prefs.getRecent();
+      const all = await dataStore.getAll();
+      const positions = recentIds.map(id => all.find(p => p.id === id)).filter(Boolean);
+      return listLayout('最近瀏覽', 'RECENTLY VIEWED', '__recent', positions, '還沒有瀏覽紀錄。');
+    }
+
+    function listLayout(titleZh, titleEn, activeCat, positions, emptyMsg) {
+      const cards = positions.length
+        ? positions.map(cardHtml).join('')
+        : emptyStateHtml(emptyMsg || '沒有符合條件的擺位。');
+      return `
+        ${headerHtml()}
+        ${titleBarHtml(titleZh, titleEn)}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16 flex flex-col lg:flex-row gap-6">
+          ${sidebarHtml(activeCat)}
+          <main class="flex-1 min-w-0">
+            <div class="text-xs text-slate-500 dark:text-slate-400 mb-3">共 ${positions.length} 筆</div>
+            <div id="card-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+              ${cards}
+            </div>
+          </main>
+        </div>
+      `;
+    }
+
+    async function viewDetail(id) {
+      const p = await dataStore.getById(id);
+      if (!p) {
+        return `
+          ${headerHtml()}
+          <div class="max-w-xl mx-auto px-4 py-24 text-center">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">找不到這筆擺位</h2>
+            <p class="text-sm text-slate-500 mt-2">ID: ${escapeHtml(id)}</p>
+            <a href="#/" class="inline-block mt-6 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm">回列表</a>
+          </div>
+        `;
+      }
+
+      // 登錄最近瀏覽
+      prefs.pushRecent(p.id);
+
+      // 同部位鄰居
+      const all = await dataStore.getAll();
+      const cat = CATEGORIES.find(c => c.id === p.category);
+      const related = await dataStore.getRelated(p);
+      const samePartList = all.filter(x => x.category === p.category);
+      const idx = samePartList.findIndex(x => x.id === p.id);
+      const prev = idx > 0 ? samePartList[idx - 1] : null;
+      const next = idx >= 0 && idx < samePartList.length - 1 ? samePartList[idx + 1] : null;
+
+      const isFav = prefs.isFavorite(p.id);
+      const hasPhoto = p.images && p.images.positioning_photo;
+      const hasXray = p.images && p.images.xray_sample;
+
+      return `
+        ${headerHtml()}
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 print-area">
+
+          <!-- 麵包屑 + 操作列 -->
+          <div class="no-print flex items-center justify-between flex-wrap gap-3 mb-4 text-sm">
+            <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+              <a href="#/" class="hover:text-brand-600">全部</a>
+              <span>/</span>
+              ${cat ? `<a href="#/category/${cat.id}" class="hover:text-brand-600">${cat.name_zh}</a>` : ''}
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="fav-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm"
+                      data-id="${p.id}" aria-label="加入我的最愛">
+                <svg class="w-4 h-4 ${isFav ? 'text-amber-400' : 'text-slate-400'}" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                <span class="hidden sm:inline">${isFav ? '已收藏' : '收藏'}</span>
+              </button>
+              <button id="share-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                <span class="hidden sm:inline">分享</span>
+              </button>
+              <button id="print-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span class="hidden sm:inline">列印</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 標題區 -->
+          <div class="bg-white dark:bg-slate-800 rounded-xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div class="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+              <h1 class="text-3xl font-bold text-slate-900 dark:text-white">${escapeHtml(p.body_part)}</h1>
+              <span class="text-lg text-slate-600 dark:text-slate-300">${escapeHtml(p.name_en)}</span>
+            </div>
+            <div class="mt-1 text-base text-slate-500 dark:text-slate-400">${escapeHtml(p.name_zh)}</div>
+
+            <!-- Position of Patient -->
+            ${p.position_of_patient && p.position_of_patient.length ? `
+              <section class="mt-8">
+                <h2 class="text-sm font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">Position of Patient <span class="text-slate-400 font-normal">擺位/姿勢</span></h2>
+                <ol class="mt-2 space-y-2 text-slate-700 dark:text-slate-200 list-decimal list-outside pl-6 leading-relaxed">
+                  ${p.position_of_patient.map(x => `<li>${escapeHtml(x)}</li>`).join('')}
+                </ol>
+              </section>
+            ` : ''}
+
+            <!-- SID / Central Ray -->
+            <section class="mt-6">
+              <h2 class="text-sm font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">SID / Central Ray <span class="text-slate-400 font-normal">距離/中心射線</span></h2>
+              <div class="mt-2 text-slate-700 dark:text-slate-200 leading-relaxed">
+                <span class="font-semibold">${p.sid_cm ? p.sid_cm + ' cm' : ''}</span>
+                ${p.sid_cm && p.central_ray ? ' / ' : ''}
+                ${p.central_ray ? escapeHtml(p.central_ray) : ''}
+              </div>
+              ${p.central_ray_notes && p.central_ray_notes.length ? `
+                <ol class="mt-2 space-y-1 text-slate-600 dark:text-slate-300 list-decimal list-outside pl-6 text-sm leading-relaxed">
+                  ${p.central_ray_notes.map(x => `<li>${escapeHtml(x)}</li>`).join('')}
+                </ol>
+              ` : ''}
+            </section>
+
+            <!-- 圖片(並排)-->
+            <section class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              ${imageBlock(hasPhoto, '擺位照', '姿勢 positioning')}
+              ${imageBlock(hasXray, 'X 光示範片', 'X-ray sample')}
+            </section>
+
+            <!-- Evaluation Criteria -->
+            ${p.evaluation_criteria && p.evaluation_criteria.length ? `
+              <section class="mt-6">
+                <h2 class="text-sm font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">Evaluation Criteria <span class="text-slate-400 font-normal">評片標準</span></h2>
+                <ol class="mt-2 space-y-2 text-slate-700 dark:text-slate-200 list-decimal list-outside pl-6 leading-relaxed">
+                  ${p.evaluation_criteria.map(x => `<li>${escapeHtml(x)}</li>`).join('')}
+                </ol>
+              </section>
+            ` : ''}
+
+            <!-- Tips -->
+            ${p.tips && p.tips.length ? `
+              <section class="mt-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50">
+                <h2 class="text-sm font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Tips <span class="text-amber-500/70 font-normal">提示 — 若病人無法配合時</span></h2>
+                <ol class="mt-2 space-y-1 text-amber-900 dark:text-amber-100 list-decimal list-outside pl-6 text-sm leading-relaxed">
+                  ${p.tips.map(x => `<li>${escapeHtml(x)}</li>`).join('')}
+                </ol>
+              </section>
+            ` : ''}
+
+            <!-- Notes -->
+            ${p.notes ? `
+              <section class="mt-6 text-xs text-slate-400 dark:text-slate-500 italic">
+                備註:${escapeHtml(p.notes)}
+              </section>
+            ` : ''}
+          </div>
+
+          <!-- 相關擺位 -->
+          ${related.length ? `
+            <section class="no-print mt-8">
+              <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">相關擺位</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                ${related.map(cardHtml).join('')}
+              </div>
+            </section>
+          ` : ''}
+
+          <!-- 上一筆 / 下一筆 -->
+          <nav class="no-print mt-8 flex items-stretch gap-3">
+            ${prev ? `
+              <a href="#/position/${prev.id}" class="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                <div class="min-w-0">
+                  <div class="text-xs text-slate-400">上一筆</div>
+                  <div class="truncate text-sm font-medium text-slate-700 dark:text-slate-200">${escapeHtml(prev.name_zh)}</div>
+                </div>
+              </a>
+            ` : `<div class="flex-1"></div>`}
+            ${next ? `
+              <a href="#/position/${next.id}" class="flex-1 flex items-center justify-end gap-3 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-right">
+                <div class="min-w-0">
+                  <div class="text-xs text-slate-400">下一筆</div>
+                  <div class="truncate text-sm font-medium text-slate-700 dark:text-slate-200">${escapeHtml(next.name_zh)}</div>
+                </div>
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            ` : `<div class="flex-1"></div>`}
+          </nav>
+        </div>
+      `;
+    }
+
+    function imageBlock(src, labelZh, labelEn) {
+      if (src) {
+        return `
+          <figure class="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-black">
+            <img src="${escapeHtml(src)}" alt="${escapeHtml(labelZh)}"
+                 class="w-full aspect-square object-contain cursor-zoom-in lightbox-trigger"
+                 data-src="${escapeHtml(src)}">
+            <figcaption class="text-center text-xs text-slate-500 py-2 bg-white dark:bg-slate-800">${escapeHtml(labelZh)}</figcaption>
+          </figure>
+        `;
+      }
+      return `
+        <div class="rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+          <div class="aspect-square img-placeholder flex items-center justify-center text-slate-500 text-sm">(圖片待補)</div>
+          <div class="text-center text-xs text-slate-500 py-2 bg-white dark:bg-slate-800">${escapeHtml(labelZh)}</div>
+        </div>
+      `;
+    }
+
+    // ===== Post-render(綁定事件) =====
+    function postRender() {
+      // 搜尋
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', debounce(async (e) => {
+          const kw = e.target.value;
+          const results = await dataStore.search(kw);
+          const grid = document.getElementById('card-grid');
+          if (grid) {
+            grid.innerHTML = results.length
+              ? results.map(cardHtml).join('')
+              : emptyStateHtml('沒有符合搜尋條件的擺位。');
+          }
+        }, 120));
+
+        const clearBtn = document.getElementById('search-clear');
+        if (clearBtn) clearBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          searchInput.dispatchEvent(new Event('input'));
+          searchInput.focus();
+        });
+      }
+
+      // 深色模式
+      const themeBtn = document.getElementById('theme-toggle');
+      if (themeBtn) themeBtn.addEventListener('click', () => {
+        prefs.toggleTheme();
+        // 重新渲染以更新 icon
+        router.handle();
+      });
+
+      // 我的最愛
+      document.querySelectorAll('.fav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const id = btn.getAttribute('data-id');
+          prefs.toggleFavorite(id);
+          router.handle();
+        });
+      });
+
+      // Lightbox
+      document.querySelectorAll('.lightbox-trigger').forEach(img => {
+        img.addEventListener('click', () => openLightbox(img.getAttribute('data-src')));
+      });
+      const lb = document.getElementById('lightbox');
+      lb.addEventListener('click', () => { lb.hidden = true; });
+
+      // 分享
+      const shareBtn = document.getElementById('share-btn');
+      if (shareBtn) shareBtn.addEventListener('click', () => {
+        const url = location.href;
+        navigator.clipboard.writeText(url)
+          .then(() => toast('連結已複製到剪貼簿'))
+          .catch(() => toast('複製失敗,請手動複製網址'));
+      });
+
+      // 列印
+      const printBtn = document.getElementById('print-btn');
+      if (printBtn) printBtn.addEventListener('click', () => window.print());
+    }
+
+    function openLightbox(src) {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      lb.hidden = false;
+    }
+
+    // ===== Utils =====
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function debounce(fn, ms) {
+      let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+    }
+
+    // 鍵盤 esc 關 lightbox
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const lb = document.getElementById('lightbox');
+        if (lb && !lb.hidden) lb.hidden = true;
+      }
+    });
+
+    // ===== 啟動 =====
+    applyTheme(prefs.getTheme());
+    dataStore.init().then(() => router.init());
+
+    // 暴露到全域方便 debug
+    window.__radpos = { dataStore, prefs, router, CATEGORIES };
+  })();
+  </script>
+</body>
+</html>
