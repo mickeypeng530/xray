@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    html { font-size: 17px; }
+    html { font-size: 20px; } /* 預設「中」,可由前端切換 */
     html, body { font-family: 'Noto Sans TC', system-ui, sans-serif; }
 
     /* 卡片淡入 */
@@ -315,8 +315,16 @@
     const LS_KEYS = {
       FAVORITES: 'radpos.favorites',
       RECENT: 'radpos.recent',
-      THEME: 'radpos.theme'
+      THEME: 'radpos.theme',
+      FONT_SIZE: 'radpos.fontSize'
     };
+
+    const FONT_SIZES = [
+      { id: 'sm',  label: '小',   px: 17 },
+      { id: 'md',  label: '中',   px: 20 },
+      { id: 'lg',  label: '大',   px: 23 },
+      { id: 'xl',  label: '最大', px: 26 }
+    ];
 
     // ===== 資料層(Phase 1:只讀 seed;Phase 2 會加 localStorage 寫入)=====
     const dataStore = {
@@ -404,11 +412,25 @@
       },
       toggleTheme() {
         this.setTheme(this.getTheme() === 'dark' ? 'light' : 'dark');
+      },
+
+      getFontSize() {
+        return localStorage.getItem(LS_KEYS.FONT_SIZE) || 'md';
+      },
+      setFontSize(id) {
+        if (!FONT_SIZES.find(f => f.id === id)) return;
+        localStorage.setItem(LS_KEYS.FONT_SIZE, id);
+        applyFontSize(id);
       }
     };
 
     function applyTheme(t) {
       document.documentElement.classList.toggle('dark', t === 'dark');
+    }
+
+    function applyFontSize(id) {
+      const f = FONT_SIZES.find(x => x.id === id) || FONT_SIZES[1];
+      document.documentElement.style.fontSize = f.px + 'px';
     }
 
     // ===== Toast =====
@@ -499,6 +521,15 @@
               </div>
             </div>
 
+            <div class="hidden sm:inline-flex items-center rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden text-xs" role="group" aria-label="字體大小">
+              ${FONT_SIZES.map(f => `
+                <button type="button" class="font-size-btn px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 ${prefs.getFontSize() === f.id ? 'bg-brand-600 text-white hover:bg-brand-700 dark:hover:bg-brand-700' : 'text-slate-600 dark:text-slate-300'}"
+                        data-size="${f.id}" aria-label="字體${f.label}" aria-pressed="${prefs.getFontSize() === f.id}">
+                  ${f.label}
+                </button>
+              `).join('')}
+            </div>
+
             <button id="theme-toggle" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300"
                     aria-label="切換深色模式">
               ${isDark
@@ -522,28 +553,28 @@
               全部擺位
             </a>
             ${CATEGORIES.map(c => `
-              <a href="#/category/${c.id}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${activeCategory === c.id ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+              <a href="#/category/${c.id}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-base ${activeCategory === c.id ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
                 <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
                 ${c.name_zh}
               </a>
             `).join('')}
 
             <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700 space-y-1">
-              <a href="#/favorites" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm ${activeCategory === '__favorites' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+              <a href="#/favorites" class="flex items-center justify-between px-3 py-2 rounded-lg text-base ${activeCategory === '__favorites' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
                 <span class="flex items-center gap-2">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                   我的最愛
                 </span>
                 ${favCount > 0 ? `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700">${favCount}</span>` : ''}
               </a>
-              <a href="#/recent" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm ${activeCategory === '__recent' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+              <a href="#/recent" class="flex items-center justify-between px-3 py-2 rounded-lg text-base ${activeCategory === '__recent' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
                 <span class="flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                   最近瀏覽
                 </span>
                 ${recentCount > 0 ? `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700">${recentCount}</span>` : ''}
               </a>
-              <a href="#/admin" class="flex items-center justify-between px-3 py-2 rounded-lg text-sm ${activeCategory === '__admin' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+              <a href="#/admin" class="flex items-center justify-between px-3 py-2 rounded-lg text-base ${activeCategory === '__admin' ? 'bg-brand-50 dark:bg-brand-700/30 text-brand-700 dark:text-brand-100 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
                 <span class="flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   管理(預覽)
@@ -1496,6 +1527,14 @@
         router.handle();
       });
 
+      // 字體大小
+      document.querySelectorAll('.font-size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          prefs.setFontSize(btn.dataset.size);
+          router.handle(); // 重新渲染以更新按鈕高亮
+        });
+      });
+
       // 我的最愛
       document.querySelectorAll('.fav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1560,6 +1599,7 @@
 
     // ===== 啟動 =====
     applyTheme(prefs.getTheme());
+    applyFontSize(prefs.getFontSize());
     dataStore.init().then(() => router.init());
 
     // 暴露到全域方便 debug
